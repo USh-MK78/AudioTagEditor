@@ -18,13 +18,12 @@ namespace AudioTagEditor
         {
             InitializeComponent();
             AlbumCoverpictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-
             AlbumCoverpictureBox.ContextMenuStrip = contextMenuStrip1;
         }
 
         string p = "";
-        TagLib.File file = null;
-        List<string> mp3List = new List<string>();
+        public TagLib.File file = null;
+        List<string[]> mp3List = new List<string[]>();
 
         public Mp3AudioPropertyGridSetting mp3AudioPGSetting { get; set; }
 
@@ -44,7 +43,6 @@ namespace AudioTagEditor
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-
                 MusicList_listBox.Items.Clear();
                 MusicList_listBox.Update();
                 AlbumCoverpictureBox.Image = null;
@@ -54,12 +52,17 @@ namespace AudioTagEditor
                 p = Path.GetDirectoryName(openFileDialog.FileName);
 
                 //mp3List = new List<string>();
-                mp3List.AddRange(Directory.GetFiles(p, "*.mp3", SearchOption.AllDirectories).Select(x => Path.GetFileName(x)).ToList().ToArray());
-                mp3List.AddRange(Directory.GetFiles(p, "*.wav", SearchOption.AllDirectories).Select(x => Path.GetFileName(x)).ToList().ToArray());
-                mp3List.AddRange(Directory.GetFiles(p, "*.m4a", SearchOption.AllDirectories).Select(x => Path.GetFileName(x)).ToList().ToArray());
-                mp3List.AddRange(Directory.GetFiles(p, "*.ogg", SearchOption.AllDirectories).Select(x => Path.GetFileName(x)).ToList().ToArray());
+                foreach (var path in Directory.GetFiles(p, "*.mp3", SearchOption.AllDirectories).ToArray()) mp3List.Add(new string[] { "mp3", p, Path.GetFileName(path), path, path.Replace(p, "") });
+                foreach (var path in Directory.GetFiles(p, "*.wav", SearchOption.AllDirectories).ToArray()) mp3List.Add(new string[] { "wav", p, Path.GetFileName(path), path, path.Replace(p, "") });
+                foreach (var path in Directory.GetFiles(p, "*.m4a", SearchOption.AllDirectories).ToArray()) mp3List.Add(new string[] { "m4a", p, Path.GetFileName(path), path, path.Replace(p, "") });
+                foreach (var path in Directory.GetFiles(p, "*.ogg", SearchOption.AllDirectories).ToArray()) mp3List.Add(new string[] { "ogg", p, Path.GetFileName(path), path, path.Replace(p, "") });
 
-                MusicList_listBox.Items.AddRange(mp3List.ToArray());
+                //mp3List.Add(Directory.GetFiles(p, "*.mp3", SearchOption.AllDirectories).Select(x => Path.GetFileName(x)).ToArray());
+                //mp3List.AddRange(Directory.GetFiles(p, "*.wav", SearchOption.AllDirectories).Select(x => Path.GetFileName(x)).ToList().ToArray());
+                //mp3List.AddRange(Directory.GetFiles(p, "*.m4a", SearchOption.AllDirectories).Select(x => Path.GetFileName(x)).ToList().ToArray());
+                //mp3List.AddRange(Directory.GetFiles(p, "*.ogg", SearchOption.AllDirectories).Select(x => Path.GetFileName(x)).ToList().ToArray());
+
+                MusicList_listBox.Items.AddRange(mp3List.Select(x => x[2]).ToArray());
 
                 if (mp3List.Count != 0) MusicList_listBox.SelectedIndex = 0;
                 if (mp3List.Count == 0) MusicList_listBox.SelectedIndex = -1;
@@ -74,7 +77,7 @@ namespace AudioTagEditor
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            file = TagLib.File.Create(p + "\\" + mp3List[MusicList_listBox.SelectedIndex]);
+            file = TagLib.File.Create(mp3List[MusicList_listBox.SelectedIndex][3]);
 
             Mp3AudioPropertyGridSetting mp3AudioPropertyGridSetting = new Mp3AudioPropertyGridSetting
             {
@@ -174,55 +177,58 @@ namespace AudioTagEditor
             AlbumCoverpictureBox.Image = mp3AudioPGSetting.ToImages[AlbumCoverComboBox.SelectedIndex];
         }
 
-        private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        private void AudioTagPropertyGrid_Leave(object sender, EventArgs e)
         {
-            file.Tag.Title = mp3AudioPGSetting.Title;
+            if (AudioTagPropertyGrid.SelectedObject != null)
+            {
+                file.Tag.Title = mp3AudioPGSetting.Title;
 
-            file.Tag.Performers = mp3AudioPGSetting.ArtistNameList.Select(x => x.Name).ToArray();
-            file.Tag.AlbumArtists = mp3AudioPGSetting.AlbumArtistNameList.Select(x => x.Name).ToArray();
-            file.Tag.Composers = mp3AudioPGSetting.ComposersNameList.Select(x => x.Name).ToArray();
-            file.Tag.Track = mp3AudioPGSetting.TrackAndDiscCountData.Track;
-            file.Tag.TrackCount = mp3AudioPGSetting.TrackAndDiscCountData.TrackCount;
-            file.Tag.Disc = mp3AudioPGSetting.TrackAndDiscCountData.Disc;
-            file.Tag.DiscCount = mp3AudioPGSetting.TrackAndDiscCountData.DiscCount;
-            file.Tag.Year = mp3AudioPGSetting.Year;
-            file.Tag.Genres = mp3AudioPGSetting.GenresList.Select(x => x.GenresName).ToArray();
-            file.Tag.Subtitle = mp3AudioPGSetting.SubTitle;
-            file.Tag.BeatsPerMinute = mp3AudioPGSetting.BeatPerMinute;
-            file.Tag.Description = mp3AudioPGSetting.Description;
-            file.Tag.AmazonId = mp3AudioPGSetting.AmazonId;
-            file.Tag.Comment = mp3AudioPGSetting.Comment;
-            file.Tag.Conductor = mp3AudioPGSetting.Conductor;
-            file.Tag.Copyright = mp3AudioPGSetting.Copyright;
-            file.Tag.DateTagged = mp3AudioPGSetting.DateTagged;
-            file.Tag.Grouping = mp3AudioPGSetting.Grouping;
-            file.Tag.InitialKey = mp3AudioPGSetting.InitialKey;
-            file.Tag.ISRC = mp3AudioPGSetting.ISRC;
-            file.Tag.Lyrics = mp3AudioPGSetting.Lyrics;
+                file.Tag.Performers = mp3AudioPGSetting.ArtistNameList.Select(x => x.Name).ToArray();
+                file.Tag.AlbumArtists = mp3AudioPGSetting.AlbumArtistNameList.Select(x => x.Name).ToArray();
+                file.Tag.Composers = mp3AudioPGSetting.ComposersNameList.Select(x => x.Name).ToArray();
+                file.Tag.Track = mp3AudioPGSetting.TrackAndDiscCountData.Track;
+                file.Tag.TrackCount = mp3AudioPGSetting.TrackAndDiscCountData.TrackCount;
+                file.Tag.Disc = mp3AudioPGSetting.TrackAndDiscCountData.Disc;
+                file.Tag.DiscCount = mp3AudioPGSetting.TrackAndDiscCountData.DiscCount;
+                file.Tag.Year = mp3AudioPGSetting.Year;
+                file.Tag.Genres = mp3AudioPGSetting.GenresList.Select(x => x.GenresName).ToArray();
+                file.Tag.Subtitle = mp3AudioPGSetting.SubTitle;
+                file.Tag.BeatsPerMinute = mp3AudioPGSetting.BeatPerMinute;
+                file.Tag.Description = mp3AudioPGSetting.Description;
+                file.Tag.AmazonId = mp3AudioPGSetting.AmazonId;
+                file.Tag.Comment = mp3AudioPGSetting.Comment;
+                file.Tag.Conductor = mp3AudioPGSetting.Conductor;
+                file.Tag.Copyright = mp3AudioPGSetting.Copyright;
+                file.Tag.DateTagged = mp3AudioPGSetting.DateTagged;
+                file.Tag.Grouping = mp3AudioPGSetting.Grouping;
+                file.Tag.InitialKey = mp3AudioPGSetting.InitialKey;
+                file.Tag.ISRC = mp3AudioPGSetting.ISRC;
+                file.Tag.Lyrics = mp3AudioPGSetting.Lyrics;
 
-            file.Tag.MusicBrainzArtistId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzArtistId;
-            file.Tag.MusicBrainzDiscId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzDiscId;
-            file.Tag.MusicBrainzReleaseArtistId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseArtistId;
-            file.Tag.MusicBrainzReleaseCountry = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseCountry;
-            file.Tag.MusicBrainzReleaseGroupId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseGroupId;
-            file.Tag.MusicBrainzReleaseId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseId;
-            file.Tag.MusicBrainzReleaseStatus = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseStatus;
-            file.Tag.MusicBrainzReleaseType = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseType;
-            file.Tag.MusicBrainzTrackId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzTrackId;
+                file.Tag.MusicBrainzArtistId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzArtistId;
+                file.Tag.MusicBrainzDiscId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzDiscId;
+                file.Tag.MusicBrainzReleaseArtistId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseArtistId;
+                file.Tag.MusicBrainzReleaseCountry = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseCountry;
+                file.Tag.MusicBrainzReleaseGroupId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseGroupId;
+                file.Tag.MusicBrainzReleaseId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseId;
+                file.Tag.MusicBrainzReleaseStatus = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseStatus;
+                file.Tag.MusicBrainzReleaseType = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzReleaseType;
+                file.Tag.MusicBrainzTrackId = mp3AudioPGSetting.MusicBrainzSections.MusicBrainzTrackId;
 
-            file.Tag.MusicIpId = mp3AudioPGSetting.MusicIpId;
-            file.Tag.PerformersRole = mp3AudioPGSetting.PerformersRoleList.Select(x => x.Value).ToArray();
-            file.Tag.Publisher = mp3AudioPGSetting.Publisher;
-            file.Tag.RemixedBy = mp3AudioPGSetting.RemixedBy;
+                file.Tag.MusicIpId = mp3AudioPGSetting.MusicIpId;
+                file.Tag.PerformersRole = mp3AudioPGSetting.PerformersRoleList.Select(x => x.Value).ToArray();
+                file.Tag.Publisher = mp3AudioPGSetting.Publisher;
+                file.Tag.RemixedBy = mp3AudioPGSetting.RemixedBy;
 
-            file.Tag.ReplayGainAlbumGain = mp3AudioPGSetting.ReplayGains.AlbumGain.ReplayGainAlbumGain;
-            file.Tag.ReplayGainAlbumPeak = mp3AudioPGSetting.ReplayGains.AlbumGain.ReplayGainAlbumPeak;
-            file.Tag.ReplayGainTrackGain = mp3AudioPGSetting.ReplayGains.TrackGain.ReplayGainTrackGain;
-            file.Tag.ReplayGainTrackPeak = mp3AudioPGSetting.ReplayGains.TrackGain.ReplayGainTrackPeak;
+                file.Tag.ReplayGainAlbumGain = mp3AudioPGSetting.ReplayGains.AlbumGain.ReplayGainAlbumGain;
+                file.Tag.ReplayGainAlbumPeak = mp3AudioPGSetting.ReplayGains.AlbumGain.ReplayGainAlbumPeak;
+                file.Tag.ReplayGainTrackGain = mp3AudioPGSetting.ReplayGains.TrackGain.ReplayGainTrackGain;
+                file.Tag.ReplayGainTrackPeak = mp3AudioPGSetting.ReplayGains.TrackGain.ReplayGainTrackPeak;
 
-            //file.Tag.TagTypes = mp3AudioPGSetting.TagType;
+                //file.Tag.TagTypes = mp3AudioPGSetting.TagType;
 
-            file.Save();
+                file.Save();
+            }
         }
 
         private void AddAlbumCoverBtn_Click(object sender, EventArgs e)
@@ -231,7 +237,7 @@ namespace AudioTagEditor
             {
                 Title = "Select Image",
                 InitialDirectory = System.Environment.CurrentDirectory,
-                Filter = "JPEG File|*.jpeg|png File|*.png"
+                Filter = "JPG File|*.jpg|JPEG File|*.jpeg|png File|*.png"
             };
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -321,6 +327,46 @@ namespace AudioTagEditor
                 PlayListEditor playListEditor = new PlayListEditor(openFileDialog.FileName);
                 playListEditor.Show();
             }
+        }
+
+        private void updateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MusicList_listBox.Items.Count != 0)
+            {
+                mp3List.Clear();
+
+                MusicList_listBox.Items.Clear();
+                MusicList_listBox.Update();
+                AlbumCoverpictureBox.Image = null;
+                AlbumCoverComboBox.Items.Clear();
+                AudioTagPropertyGrid.SelectedObject = null;
+
+                foreach (var path in Directory.GetFiles(p, "*.mp3", SearchOption.AllDirectories).ToArray()) mp3List.Add(new string[] { "mp3", p, Path.GetFileName(path), path, path.Replace(p, "") });
+                foreach (var path in Directory.GetFiles(p, "*.wav", SearchOption.AllDirectories).ToArray()) mp3List.Add(new string[] { "wav", p, Path.GetFileName(path), path, path.Replace(p, "") });
+                foreach (var path in Directory.GetFiles(p, "*.m4a", SearchOption.AllDirectories).ToArray()) mp3List.Add(new string[] { "m4a", p, Path.GetFileName(path), path, path.Replace(p, "") });
+                foreach (var path in Directory.GetFiles(p, "*.ogg", SearchOption.AllDirectories).ToArray()) mp3List.Add(new string[] { "ogg", p, Path.GetFileName(path), path, path.Replace(p, "") });
+
+                MusicList_listBox.Items.AddRange(mp3List.Select(x => x[2]).ToArray());
+
+                if (mp3List.Count != 0) MusicList_listBox.SelectedIndex = 0;
+                if (mp3List.Count == 0) MusicList_listBox.SelectedIndex = -1;
+
+                this.Text = "AudioTagEditor [ Open Directory :" + p + " ]";
+            }
+            if (MusicList_listBox.Items.Count == 0) return;
+
+        }
+
+        private void closeDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            mp3List.Clear();
+            MusicList_listBox.Items.Clear();
+            MusicList_listBox.Update();
+            AlbumCoverpictureBox.Image = null;
+            AlbumCoverComboBox.Items.Clear();
+            AudioTagPropertyGrid.SelectedObject = null;
+            file = null;
+            p = "";
         }
     }
 }

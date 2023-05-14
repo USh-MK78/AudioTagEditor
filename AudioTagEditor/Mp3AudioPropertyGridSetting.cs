@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.Design;
 using TagLib;
 
 namespace AudioTagEditor
@@ -15,7 +17,9 @@ namespace AudioTagEditor
     {
         public string Title { get; set; }
         public string AlbumName { get; set; }
+
         public List<ArtistName> ArtistName_List = new List<ArtistName>();
+        [Editor(typeof(ArtistName_CollectionEditor), typeof(UITypeEditor))]
         public List<ArtistName> ArtistNameList { get => ArtistName_List; set => ArtistName_List = value; }
         public class ArtistName
         {
@@ -306,6 +310,26 @@ namespace AudioTagEditor
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
         {
             return true;
+        }
+    }
+
+    class ArtistName_CollectionEditor : UITypeEditor
+    {
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        {
+            return UITypeEditorEditStyle.Modal;
+        }
+        public override object EditValue(ITypeDescriptorContext context, System.IServiceProvider provider, object value)
+        {
+            IWindowsFormsEditorService svc = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+            if (svc != null && value != null)
+            {
+                ArtistNameCollectionEditor form = new ArtistNameCollectionEditor(value as List<Mp3AudioPropertyGridSetting.ArtistName>);
+                form.ShowDialog();
+
+                value = form.ArtistNameList;
+            }
+            return value; // can also replace the wrapper object here
         }
     }
 

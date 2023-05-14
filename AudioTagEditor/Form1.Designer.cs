@@ -34,6 +34,9 @@ namespace AudioTagEditor
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectDirectoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.playlistToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editzplFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createPlaylistToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MusicList_listBox = new System.Windows.Forms.ListBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -48,8 +51,7 @@ namespace AudioTagEditor
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editImageInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editzplFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.createPlaylistToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.closeDirectoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -66,7 +68,8 @@ namespace AudioTagEditor
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
-            this.playlistToolStripMenuItem});
+            this.playlistToolStripMenuItem,
+            this.updateToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(893, 24);
@@ -76,7 +79,8 @@ namespace AudioTagEditor
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectDirectoryToolStripMenuItem});
+            this.selectDirectoryToolStripMenuItem,
+            this.closeDirectoryToolStripMenuItem});
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.openToolStripMenuItem.Text = "Open";
@@ -84,7 +88,7 @@ namespace AudioTagEditor
             // selectDirectoryToolStripMenuItem
             // 
             this.selectDirectoryToolStripMenuItem.Name = "selectDirectoryToolStripMenuItem";
-            this.selectDirectoryToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.selectDirectoryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.selectDirectoryToolStripMenuItem.Text = "Select Directory";
             this.selectDirectoryToolStripMenuItem.Click += new System.EventHandler(this.selectDirectoryToolStripMenuItem_Click);
             // 
@@ -96,6 +100,26 @@ namespace AudioTagEditor
             this.playlistToolStripMenuItem.Name = "playlistToolStripMenuItem";
             this.playlistToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.playlistToolStripMenuItem.Text = "Playlist";
+            // 
+            // editzplFileToolStripMenuItem
+            // 
+            this.editzplFileToolStripMenuItem.Name = "editzplFileToolStripMenuItem";
+            this.editzplFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.editzplFileToolStripMenuItem.Text = "Edit .zpl file";
+            this.editzplFileToolStripMenuItem.Click += new System.EventHandler(this.editzplFileToolStripMenuItem_Click);
+            // 
+            // createPlaylistToolStripMenuItem
+            // 
+            this.createPlaylistToolStripMenuItem.Name = "createPlaylistToolStripMenuItem";
+            this.createPlaylistToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.createPlaylistToolStripMenuItem.Text = "Create Playlist";
+            // 
+            // updateToolStripMenuItem
+            // 
+            this.updateToolStripMenuItem.Name = "updateToolStripMenuItem";
+            this.updateToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
+            this.updateToolStripMenuItem.Text = "Update";
+            this.updateToolStripMenuItem.Click += new System.EventHandler(this.updateToolStripMenuItem_Click);
             // 
             // MusicList_listBox
             // 
@@ -137,7 +161,7 @@ namespace AudioTagEditor
             this.AudioTagPropertyGrid.Name = "AudioTagPropertyGrid";
             this.AudioTagPropertyGrid.Size = new System.Drawing.Size(338, 372);
             this.AudioTagPropertyGrid.TabIndex = 0;
-            this.AudioTagPropertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
+            this.AudioTagPropertyGrid.Leave += new System.EventHandler(this.AudioTagPropertyGrid_Leave);
             // 
             // tabPage2
             // 
@@ -248,18 +272,12 @@ namespace AudioTagEditor
             this.exportImageToolStripMenuItem.Text = "Export Image";
             this.exportImageToolStripMenuItem.Click += new System.EventHandler(this.exportImageToolStripMenuItem_Click);
             // 
-            // editzplFileToolStripMenuItem
+            // closeDirectoryToolStripMenuItem
             // 
-            this.editzplFileToolStripMenuItem.Name = "editzplFileToolStripMenuItem";
-            this.editzplFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.editzplFileToolStripMenuItem.Text = "Edit .zpl file";
-            this.editzplFileToolStripMenuItem.Click += new System.EventHandler(this.editzplFileToolStripMenuItem_Click);
-            // 
-            // createPlaylistToolStripMenuItem
-            // 
-            this.createPlaylistToolStripMenuItem.Name = "createPlaylistToolStripMenuItem";
-            this.createPlaylistToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.createPlaylistToolStripMenuItem.Text = "Create Playlist";
+            this.closeDirectoryToolStripMenuItem.Name = "closeDirectoryToolStripMenuItem";
+            this.closeDirectoryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.closeDirectoryToolStripMenuItem.Text = "Close Directory";
+            this.closeDirectoryToolStripMenuItem.Click += new System.EventHandler(this.closeDirectoryToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -308,6 +326,8 @@ namespace AudioTagEditor
         private System.Windows.Forms.ToolStripMenuItem exportImageToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editzplFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createPlaylistToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem updateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem closeDirectoryToolStripMenuItem;
     }
 }
 
