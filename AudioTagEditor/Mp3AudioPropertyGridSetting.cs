@@ -104,13 +104,18 @@ namespace AudioTagEditor
         }
 
         [TypeConverter(typeof(CustomSortTypeConverter))]
-        public TrackAndDiscCount TrackAndDiscCountData = new TrackAndDiscCount();
+        public TrackAndDiscCount TrackAndDiscCountData { get; set; } = new TrackAndDiscCount();
         public class TrackAndDiscCount
         {
             public uint Track { get; set; }
             public uint TrackCount { get; set; }
             public uint Disc { get; set; }
             public uint DiscCount { get; set; }
+
+            public override string ToString()
+            {
+                return "TrackAndDiskCount";
+            }
         }
 
         public uint Year { get; set; }
@@ -236,7 +241,7 @@ namespace AudioTagEditor
 
                 public override string ToString()
                 {
-                    return "AlbumGain";
+                    return "[ AlbumGain ] " + "Gain: " + ReplayGainAlbumGain + " | " + "Peak: " + ReplayGainAlbumPeak;
                 }
             }
 
@@ -249,7 +254,7 @@ namespace AudioTagEditor
 
                 public override string ToString()
                 {
-                    return "TrackGain";
+                    return "[ TrackGain ] " + "Gain: " + ReplayGainTrackGain + " | " + "Peak: " + ReplayGainTrackPeak;
                 }
             }
 

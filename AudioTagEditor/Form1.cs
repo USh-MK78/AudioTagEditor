@@ -182,7 +182,7 @@ namespace AudioTagEditor
             if (AudioTagPropertyGrid.SelectedObject != null)
             {
                 file.Tag.Title = mp3AudioPGSetting.Title;
-
+                file.Tag.Album = mp3AudioPGSetting.AlbumName;
                 file.Tag.Performers = mp3AudioPGSetting.ArtistNameList.Select(x => x.Name).ToArray();
                 file.Tag.AlbumArtists = mp3AudioPGSetting.AlbumArtistNameList.Select(x => x.Name).ToArray();
                 file.Tag.Composers = mp3AudioPGSetting.ComposersNameList.Select(x => x.Name).ToArray();
